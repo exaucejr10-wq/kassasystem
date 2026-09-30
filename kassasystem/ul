@@ -1,4 +1,4 @@
-// Klassen UI: allt som handlar om användaren – menyer, inmatning och utskrift.
+ // Klassen UI: allt som handlar om användaren – menyer, inmatning och utskrift.
 public static class UI
 {
     // ---------- Menytext (returnerar text, skriver inte ut) ----------
