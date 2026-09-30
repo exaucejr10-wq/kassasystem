@@ -1,0 +1,164 @@
+// Klassen Enhet beskriver EN enhet i registret.
+// Den håller enhetens data (egenskaper) och metoderna som räknar på just den enheten.
+public class Enhet
+{
+    // ---------- Egenskaper (data) ----------
+    // Id, Namn och Typ ändras aldrig efter att enheten skapats (bara get).
+    // Status och Pris kan ändras från menyn (get och set).
+    public string Id { get; }
+    public string Namn { get; }
+    public string Typ { get; }
+    public string Status { get; set; }
+    public decimal Pris { get; set; }
+
+    // ---------- Konstruktor ----------
+    // Körs när vi skriver "new Enhet(...)" och fyller i enhetens data.
+    public Enhet(string id, string namn, string typ, string status, decimal pris)
+    {
+        Id = id;
+        Namn = namn;
+        Typ = typ;
+        Status = status;
+        Pris = pris;
+    }
+
+    // ---------- Metoder ----------
+    // Samma logik som förut, men metoderna använder enhetens egna värden
+    // i stället för att få dem som parametrar.
+
+    public string HamtaTypInformation()
+    {
+        switch (Typ.ToLower())
+        {
+            case "dator":
+                return "Utrustning för datorarbete.";
+            case "projektor":
+                return "Utrustning för presentation.";
+            case "skärm":
+                return "Bildskärmsutrustning.";
+            case "övrigt":
+                return "Annan registrerad utrustning.";
+            default:
+                return "Okänd typ.";
+        }
+    }
+
+    public string HamtaStatusInformation()
+    {
+        switch (Status.ToLower())
+        {
+            case "aktiv":
+                return "Enheten är i drift.";
+            case "service":
+                return "Enheten behöver kontrolleras.";
+            case "inaktiv":
+                return "Enheten används inte.";
+            default:
+                return "Okänd status.";
+        }
+    }
+
+    public string HamtaPrisniva()
+    {
+        if (Pris > 700)
+        {
+            return "Hög kostnad";
+        }
+        else if (Pris >= 300)
+        {
+            return "Normal kostnad";
+        }
+        else
+        {
+            return "Låg kostnad";
+        }
+    }
+
+    public decimal HamtaPrisMedMoms()
+    {
+        return Prisberakningar.BeraknaPrisMedMoms(Pris);
+    }
+
+    public string HamtaBedomning()
+    {
+        string statusLower = Status.ToLower();
+        bool arAktiv = statusLower == "aktiv";
+        bool arService = statusLower == "service";
+        bool arInaktiv = statusLower == "inaktiv";
+        bool arOvrigt = Typ.ToLower() == "övrigt";
+
+        if (arService)
+        {
+            return "Servicebehov";
+        }
+        else if (arAktiv && Pris > 700)
+        {
+            return "Prioriterad";
+        }
+        else if (arInaktiv || arOvrigt)
+        {
+            return "Kontroll krävs";
+        }
+        else
+        {
+            return "Normal";
+        }
+    }
+
+    public string HamtaEnkelRisk()
+    {
+        string statusLower = Status.ToLower();
+        bool arService = statusLower == "service";
+        bool arInaktiv = statusLower == "inaktiv";
+
+        if (arService && Pris > 700)
+        {
+            return "Hög";
+        }
+        else if (arService || arInaktiv)
+        {
+            return "Medel";
+        }
+        else
+        {
+            return "Låg";
+        }
+    }
+
+    public int BeraknaRiskPoang()
+    {
+        string typLower = Typ.ToLower();
+        string statusLower = Status.ToLower();
+        int poang = 0;
+
+        if (statusLower == "service") poang += 3;
+        if (statusLower == "inaktiv") poang += 2;
+        if (Pris > 700) poang += 2;
+        if (typLower == "övrigt") poang += 1;
+        if (typLower == "projektor" && Pris > 900) poang += 2;
+
+        return poang;
+    }
+
+    public string HamtaRiskNiva()
+    {
+        int poang = BeraknaRiskPoang();
+
+        if (poang >= 9)
+        {
+            return "Kritisk";
+        }
+        else if (poang >= 6)
+        {
+            return "Hög";
+        }
+        else if (poang >= 3)
+        {
+            return "Medel";
+        }
+        else
+        {
+            return "Låg";
+        }
+    }
+}
