@@ -1,0 +1,128 @@
+// Klassen UI: allt som handlar om användaren – menyer, inmatning och utskrift.
+public static class UI
+{
+    // ---------- Menytext (returnerar text, skriver inte ut) ----------
+
+    public static string SkapaMenytext(string rubrik, string alternativ1, string alternativ2, string alternativ3)
+    {
+        return SkapaMenytext(rubrik, new string[] { alternativ1, alternativ2, alternativ3 });
+    }
+
+    public static string SkapaMenytext(string rubrik, string[] alternativ)
+    {
+        string text = rubrik;
+        for (int i = 0; i < alternativ.Length; i++)
+        {
+            text += Environment.NewLine + (i + 1) + ". " + alternativ[i];
+        }
+        return text;
+    }
+
+    public static string SkapaHuvudmeny()
+    {
+        return SkapaMenytext("=== Huvudmeny ===",
+            new string[] { "Visa enhet", "Ändra pris", "Förhandsvisa rabatt", "Ändra status", "Avsluta" });
+    }
+
+    public static string SkapaStatusmeny()
+    {
+        return SkapaMenytext("Välj ny status:",
+            new string[] { "Aktiv", "Inaktiv", "Service", "Avbryt" });
+    }
+
+    // ---------- Inmatning ----------
+
+    // Läser ett heltal mellan min och max (inklusive) och frågar om tills det är giltigt
+    public static int LasaHeltal(string fraga, int min, int max)
+    {
+        while (true)
+        {
+            Console.Write(fraga);
+            string? input = Console.ReadLine();
+
+            if (int.TryParse(input, out int tal) && tal >= min && tal <= max)
+            {
+                return tal;
+            }
+
+            Console.WriteLine($"Ogiltigt val. Ange ett heltal mellan {min} och {max}.");
+        }
+    }
+
+    // Pris: noll eller större, aldrig negativt
+    public static decimal LasaPris(string fraga)
+    {
+        while (true)
+        {
+            Console.Write(fraga);
+            string? input = Console.ReadLine();
+
+            if (decimal.TryParse(input, out decimal pris) && pris >= 0)
+            {
+                return pris;
+            }
+
+            Console.WriteLine("Ogiltigt pris. Ange ett tal som är minst 0.");
+        }
+    }
+
+    // Rabatt: 0-100 inklusive gränserna
+    public static decimal LasaRabattProcent()
+    {
+        while (true)
+        {
+            Console.Write("Ange rabatt i procent (0-100): ");
+            string? input = Console.ReadLine();
+
+            if (decimal.TryParse(input, out decimal rabatt) && rabatt >= 0 && rabatt <= 100)
+            {
+                return rabatt;
+            }
+
+            Console.WriteLine("Ogiltig rabatt. Ange ett tal mellan 0 och 100.");
+        }
+    }
+
+    // Låter användaren välja enhet och returnerar själva Enhet-objektet
+    public static Enhet ValjEnhet(Enhet[] enheter)
+    {
+        Console.WriteLine("Välj enhet att arbeta med:");
+        for (int i = 0; i < enheter.Length; i++)
+        {
+            Console.WriteLine($"{i + 1}. {enheter[i].Namn}");
+        }
+        int index = LasaHeltal("Val: ", 1, enheter.Length) - 1;
+        return enheter[index];
+    }
+
+    // ---------- Presentation ----------
+
+    // Sammanställd text om en enhet. Tar emot hela objektet i stället för 13 parametrar.
+    public static string SkapaEnhetstext(Enhet enhet)
+    {
+        string nl = Environment.NewLine;
+        return "================================" + nl +
+               $"ID: {enhet.Id}" + nl +
+               $"Namn: {enhet.Namn}" + nl +
+               $"Typ: {enhet.Typ} ({enhet.HamtaTypInformation()})" + nl +
+               $"Status: {enhet.Status} ({enhet.HamtaStatusInformation()})" + nl +
+               $"Pris: {enhet.Pris:F2} kr ({enhet.HamtaPrisniva()})" + nl +
+               $"Pris inklusive moms: {enhet.HamtaPrisMedMoms():F2} kr" + nl +
+               $"Bedömning: {enhet.HamtaBedomning()}" + nl +
+               $"Enkel risknivå: {enhet.HamtaEnkelRisk()}" + nl +
+               $"Riskpoäng: {enhet.BeraknaRiskPoang()} -> {enhet.HamtaRiskNiva()}";
+    }
+
+    // Tar emot färdiga beräkningsresultat, räknar inget själv
+    public static void VisaPrisforhandsvisning(decimal originalpris, decimal rabattProcent,
+        decimal rabatteratPris, decimal momsbelopp, decimal totalpris)
+    {
+        Console.WriteLine();
+        Console.WriteLine("--- Prisförhandsvisning ---");
+        Console.WriteLine($"Originalpris:                 {originalpris:F2} kr");
+        Console.WriteLine($"Rabatt:                       {rabattProcent:F2} %");
+        Console.WriteLine($"Pris efter rabatt exkl. moms: {rabatteratPris:F2} kr");
+        Console.WriteLine($"Momsbelopp:                   {momsbelopp:F2} kr");
+        Console.WriteLine($"Totalpris inkl. moms:         {totalpris:F2} kr");
+    }
+}
