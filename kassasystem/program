@@ -1,0 +1,133 @@
+// ===================== DEL 1: ENHETERNA =====================
+// Förut: fyra separata arrayer (id, namn, status, priser) + typer.
+// Nu: en array med Enhet-objekt. Varje objekt håller all sin egen data.
+// (Typerna är samma som förut – byt ut mot dina egna fyra typer om du vill.)
+
+Enhet[] enheter =
+{
+    new Enhet("D-100", "Laptopsal 1",   "Dator",     "Aktiv",   250m),
+    new Enhet("D-200", "Projektor 1",   "Projektor", "Service", 450m),
+    new Enhet("D-300", "Skrivare 1",    "Skärm",     "Inaktiv", 300m),
+    new Enhet("D-400", "Tangentbord 1", "Övrigt",    "Aktiv",   350m)
+};
+
+
+// ===================== DEL 2: VISNING AV ALLA ENHETER =====================
+
+Console.WriteLine("=== Enhetsregister ===");
+
+foreach (Enhet enhet in enheter)
+{
+    Console.WriteLine();
+    Console.WriteLine(UI.SkapaEnhetstext(enhet));
+}
+
+
+// ===================== DEL 3: MENYN =====================
+
+Console.WriteLine();
+Enhet vald = UI.ValjEnhet(enheter);   // enheten vi arbetar med
+
+bool kor = true;
+while (kor)
+{
+    Console.WriteLine();
+    Console.WriteLine(UI.SkapaHuvudmeny());
+    int val = UI.LasaHeltal("Val: ", 1, 5);
+
+    switch (val)
+    {
+        case 1: // Visa enhet
+            Console.WriteLine(UI.SkapaEnhetstext(vald));
+            break;
+
+        case 2: // Ändra pris
+            vald.Pris = UI.LasaPris("Ange nytt pris exkl. moms: ");
+            Console.WriteLine("Priset är uppdaterat:");
+            Console.WriteLine(UI.SkapaEnhetstext(vald));
+            break;
+
+        case 3: // Förhandsvisa rabatt (ändrar INTE sparat pris)
+            KorPrisforhandsvisning(vald.Pris);
+            break;
+
+        case 4: // Ändra status
+            Console.WriteLine(UI.SkapaStatusmeny());
+            int statusVal = UI.LasaHeltal("Val: ", 1, 4);
+
+            if (statusVal == 4)
+            {
+                Console.WriteLine("Avbrutet. Statusen är oförändrad.");
+                break;
+            }
+
+            string nyStatus = HamtaNyStatus(statusVal);
+            Console.WriteLine(UI.SkapaMenytext($"Byta status till {nyStatus}?", "Ja", "Nej", "Avbryt"));
+            int bekrafta = UI.LasaHeltal("Val: ", 1, 3);
+
+            if (bekrafta == 1)
+            {
+                vald.Status = nyStatus;
+                Console.WriteLine("Status ändrad:");
+                Console.WriteLine(UI.SkapaEnhetstext(vald));
+            }
+            else
+            {
+                Console.WriteLine("Statusen är oförändrad.");
+            }
+            break;
+
+        case 5:
+            kor = false;
+            break;
+    }
+}
+
+Console.WriteLine("Programmet avslutas.");
+
+
+// ===================== DEL 4: HJÄLPMETODER FÖR MENYN =====================
+
+// Undermeny för förhandsvisning. Tar emot priset som parameter och ändrar inget.
+static void KorPrisforhandsvisning(decimal pris)
+{
+    bool tillbaka = false;
+    while (!tillbaka)
+    {
+        Console.WriteLine();
+        Console.WriteLine(UI.SkapaMenytext("--- Förhandsvisning ---", "Ange rabatt", "Visa originalpris", "Tillbaka"));
+        int val = UI.LasaHeltal("Val: ", 1, 3);
+
+        if (val == 1)
+        {
+            decimal rabattProcent = UI.LasaRabattProcent();
+            decimal rabatteratPris = Prisberakningar.BeraknaRabatteratPris(pris, rabattProcent);
+            decimal momsbelopp = Prisberakningar.BeraknaMomsbelopp(rabatteratPris);
+            decimal totalpris = Prisberakningar.BeraknaPrisMedMoms(rabatteratPris);
+
+            UI.VisaPrisforhandsvisning(pris, rabattProcent, rabatteratPris, momsbelopp, totalpris);
+        }
+        else if (val == 2)
+        {
+            Console.WriteLine($"Originalpris: {pris:F2} kr exkl. moms");
+        }
+        else
+        {
+            tillbaka = true;
+        }
+    }
+}
+
+// Gör om menyvalet till en statustext
+static string HamtaNyStatus(int val)
+{
+    switch (val)
+    {
+        case 1:
+            return "Aktiv";
+        case 2:
+            return "Inaktiv";
+        default:
+            return "Service";
+    }
+}
