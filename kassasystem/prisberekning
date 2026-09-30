@@ -1,0 +1,26 @@
+// Klassen Prisberakningar: bara beräkningar.
+// Läser aldrig från och skriver aldrig till konsolen.
+public static class Prisberakningar
+{
+    // Momsregeln finns bara på ett ställe
+    private const decimal MomsSats = 0.25m;
+
+    // Pris efter rabatt, exklusive moms
+    public static decimal BeraknaRabatteratPris(decimal pris, decimal rabattProcent)
+    {
+        decimal rabattBelopp = pris * (rabattProcent / 100m);
+        return pris - rabattBelopp;
+    }
+
+    // Själva momsbeloppet (25 %)
+    public static decimal BeraknaMomsbelopp(decimal pris)
+    {
+        return pris * MomsSats;
+    }
+
+    // Pris inklusive moms, återanvänder BeraknaMomsbelopp
+    public static decimal BeraknaPrisMedMoms(decimal pris)
+    {
+        return pris + BeraknaMomsbelopp(pris);
+    }
+}
