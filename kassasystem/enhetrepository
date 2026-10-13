@@ -1,0 +1,55 @@
+using System.Globalization;
+
+// Repository som sparar enheter i en textfil.
+// Informationen finns kvar nästa gång programmet startar.
+// Varje enhet blir en rad i filen, t.ex:  1;Ventilationsaggregat;Aktiv;12500.00
+public class FilEnhetRepository : IEnhetRepository
+{
+    private string filnamn;
+
+    public FilEnhetRepository(string filnamn)
+    {
+        this.filnamn = filnamn;
+    }
+
+    public List<Enhet> HamtaAlla()
+    {
+        List<Enhet> enheter = new();
+
+        // Om filen inte finns än (första körningen) returnerar vi en tom lista.
+        if (!File.Exists(filnamn))
+        {
+            return enheter;
+        }
+
+        // Läs alla rader och gör om varje rad till ett Enhet-objekt.
+        foreach (string rad in File.ReadAllLines(filnamn))
+        {
+            string[] delar = rad.Split(';');   // dela upp raden vid varje semikolon
+
+            if (delar.Length != 4)
+            {
+                continue;   // hoppa över trasiga eller tomma rader
+            }
+
+            int id = int.Parse(delar[0]);
+            string namn = delar[1];
+            string status = delar[2];
+            decimal pris = decimal.Parse(delar[3], CultureInfo.InvariantCulture);
+
+            enheter.Add(new Enhet(id, namn, status, pris));
+        }
+
+        return enheter;
+    }
+
+    public void LaggTill(Enhet enhet)
+    {
+        // InvariantCulture gör att priset alltid sparas med punkt (12500.50),
+        // oavsett om datorn är inställd på svenska eller engelska.
+        string pris = enhet.Pris.ToString(CultureInfo.InvariantCulture);
+        string rad = $"{enhet.Id};{enhet.Namn};{enhet.Status};{pris}";
+
+        // AppendAllText lägger till raden sist i filen (skapar filen om den saknas).
+        File.AppendAllText(filnamn, rad + Environment.NewLine);
+    }
