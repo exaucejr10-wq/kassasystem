@@ -1,0 +1,15 @@
+/ Modell nummer två: en felanmälan som hör till en enhet.
+// Den sparar bara enhetens ID, inte namnet. Namnet hämtar servicen senare.
+public class Felanmalan
+{
+    public int Id { get; set; }
+    public int EnhetId { get; set; }
+    public string Beskrivning { get; set; }
+
+    public Felanmalan(int id, int enhetId, string beskrivning)
+    {
+        Id = id;
+        EnhetId = enhetId;
+        Beskrivning = beskrivning;
+    }
+}
