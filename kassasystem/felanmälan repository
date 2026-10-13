@@ -1,0 +1,6 @@
+// Interface för det andra repositoryt, som hanterar felanmälningar.
+public interface IFelanmalanRepository
+{
+    List<Felanmalan> HamtaAlla();
+    void LaggTill(Felanmalan felanmalan);
+}
